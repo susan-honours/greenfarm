@@ -1,0 +1,1513 @@
+#:import SlideTransition kivy.uix.screenmanager.SlideTransition
+#:import get_color_from_hex kivy.utils.get_color_from_hex
+#:import Factory kivy.factory.Factory
+ScreenManagement:
+    transition: SlideTransition()
+    LandingPage:
+        name: 'landing_page'
+    LoginPage:
+        name: 'login_page'
+    RegisterPage:
+        name: 'register_page'	
+    UserHomePage:
+        name: 'user_home_page'
+    GreenhouseHomePage:
+        name: 'greenhouse_home_page'
+    AddGreenhousePage:
+        name: 'add_greenhouse_page'   
+    DeviceHomePage:
+        name: 'device_home_page'
+    AddDevicePage:
+        name: 'add_device_page' 
+    DeviceDashboardPage:
+        name: 'device_dashboard_page' 
+    AddEditAlertPage:
+        name: 'add_alert_page' 
+    AddScheduleItemPage:
+        name: 'add_schedule_item_page' 
+    LogoutPage:
+        name: 'logout_page' 
+    TestPage:
+        name: 'test_page' 
+
+<PopupText>:
+    text_size: self.width, None
+    font_size: self.width * 0.075
+    #valign: 'middle'
+    size: self.texture_size
+    
+<OkButton>:
+    pos_hint: {'center_y': 0.85, 'center_x': 0.5}
+    size_hint: .2, 0.09
+    text_size: self.width, None
+    font_size: self.width* self.height * 0.0047 
+    halign: 'center'
+    valign: 'middle'
+    size: self.texture_size
+    background_normal: ''
+    background_color:  0.02, 0.431, 0.22, 1    
+
+<ConfirmPopup>:
+    cols:1
+	Label:
+		text: root.text
+	GridLayout:
+        padding: 6,6
+        spacing: 6,6
+		cols: 2
+		rows: 2
+		size_hint_y: None
+		height: '44sp'
+		Button:
+			text: 'Yes'
+			on_release: root.dispatch('on_answer','yes')
+		Button:
+			text: 'No'
+			on_release: root.dispatch('on_answer', 'no')
+
+<MyAddAlertButton>
+    pos_hint: {'center_y': 0.85, 'center_x': 0.5}
+    size_hint: .2, 0.09
+    text_size: self.width, None
+    font_size: self.width * 0.045
+    halign: 'center'
+    valign: 'middle'
+    size: self.texture_size
+    background_normal: ''
+    background_color:  0.02, 0.431, 0.22, 1
+    
+<MyAddButton>
+    pos_hint: {'center_y': 0.85, 'center_x': 0.5}
+    size_hint: .2, 0.09
+    text_size: self.width, None
+    font_size: self.width * 0.1
+    halign: 'center'
+    valign: 'middle'
+    size: self.texture_size
+    background_normal: ''
+    background_color:  0.02, 0.431, 0.22, 1
+    
+<MyRemoveButton>
+    pos_hint: {'center_y': 0.85, 'center_x': 0.5}
+    size_hint: .2, 0.09
+    text_size: self.width, None
+    font_size: self.width * 0.1
+    halign: 'center'
+    valign: 'middle'
+    size: self.texture_size
+    background_normal: ''
+    background_color:  0.431, 0.02, 0.22, 1
+    
+<MyValidationLabel>
+    #text: ''                                                           #User just set the text
+    pos_hint: {'center_y': 0.95, 'center_x': 0.5}
+    text_size: self.width, None
+    font_size: self.width * 0.075
+    valign: 'middle'
+    size: self.texture_size
+    color : (1, 0.2, 0.3,0.8)
+    size_hint : 0.8, None
+
+<SensorTitle>
+    text_size: self.width, None
+    font_size: self.width*self.height * 0.0013
+    valign: 'middle'
+    halign: 'center'
+    size: self.texture_size
+    
+<MyScheduleTitle>
+    #text: ''                                                           #User just set the text
+    text_size: self.width, None
+    font_size: self.width*self.height * 0.01
+    valign: 'middle'
+    size: self.texture_size
+    
+<MyAlertTitle>
+    #text: ''                                                           #User just set the text
+    text_size: self.width, None
+    font_size: self.width*self.height * 0.008
+    valign: 'middle'
+    size: self.texture_size
+    
+<MyAlertDescription>
+    #text: ''                                                           #User just set the text
+    text_size: self.width, None
+    font_size: self.width*self.height*0.0017
+    valign: 'middle'
+    size: self.texture_size
+    
+<MyToggleButton>
+    text_size: self.width, None
+    font_size: self.width * 0.1
+    halign: 'center'
+    valign: 'middle'
+    size: self.texture_size
+    background_normal: ''
+    background_color:  0.02, 0.431, 0.22, 1
+    state : 'normal'
+
+    
+<MyCarousel>:
+    direction: 'right'
+    loop: True
+
+<MyGridLayout>:
+    cols: 2
+    padding: 6,6
+    spacing: 6,6
+    canvas:
+        Color:
+            #rgba: get_color_from_hex('#b97b3d')
+            rgba: 0.2, 0.2, 0.2, .5
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Label:
+        text: 'No greenhouses yet'
+        pos_hint: {'center_y': 0.95, 'center_x': 0.5}
+        text_size: self.width, None
+        font_size: self.width * 0.03
+        halign: 'center'
+        valign: 'middle'
+        size: self.texture_size
+      	   								
+<LandingPage>:
+    FloatLayout:
+        pos_hint: {'center_y': 0.5, 'center_x': 0.5}
+        size_hint: 1, 1
+        canvas.before:
+            Color:
+                #rgba: get_color_from_hex('#a8a8a8')
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'images/landing_page_bg.jpg'
+
+	
+        Image:
+            source: 'images/app_logo.png'
+            pos_hint: {'y': .55, 'x': 0.25}
+            size_hint: 0.5, 0.4
+
+        Label:
+            text: 'Log in'
+            pos_hint: {'center_y': 0.6, 'center_x': 0.25}
+            size_hint : (0.3,0.1)
+            text_size: self.width, None
+            font_size: self.width * 0.18
+            valign: 'middle'
+            size: self.texture_size
+	
+        TextInput:
+            pos_hint: {'center_y': 0.48, 'center_x': 0.25}
+            size_hint: .3, 0.1
+            multiline: False
+            hint_text: 'email'
+            id: username
+            text : 'susan0995@gmail.com'
+            focus: True
+            write_tab: False
+            on_text_validate: root.login()
+        Button:
+            pos_hint: {'center_y': 0.3, 'center_x': 0.25}
+            id: btn_login
+            size_hint: .3, 0.1
+            text: "Next"
+            text_size: self.width, None
+            font_size: self.width * 0.07
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            background_normal: ''
+            background_color:  0.02, 0.431, 0.22, 1			#green
+            on_press:
+                root.login()
+                #app.root.current = 'test_page'	    
+        Button:
+            pos_hint: {'center_y': 0.115, 'center_x': 0.5}
+            size_hint: .2, 0.1
+            text: "Click here to register"
+            text_size: self.width, None
+            font_size: self.width * 0.1
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            background_normal: ''
+            background_color:  0.055, 0.208, 0.396, 0
+            on_press:
+                app.root.current = 'register_page'
+                #app.root.current = 'add_schedule_item_page'
+                #app.root.current = 'test_page'
+        FloatLayout:
+            id: validation_layout
+            size_hint: 0.35, 1                                                   #User have to set pos_hint
+            pos_hint: {'center_y': 0.5, 'center_x': 0.25}  		
+
+	    
+<LoginPage>:
+    FloatLayout:
+        pos_hint: {'center_y': 0.5, 'center_x': 0.5}
+        size_hint: 1, 1
+        canvas.before:
+            Color:
+                #rgba: get_color_from_hex('#a8a8a8')
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'images/landing_page_bg.jpg'
+
+
+        ImageButton:
+            source: 'icons/back.png'
+            pos_hint: {'y': .85, 'x': 0}
+            size_hint: 0.15, 0.15
+            on_press:
+                app.root.current = 'landing_page'
+                	
+        Image:
+            source: 'images/app_logo.png'
+            pos_hint: {'y': .5, 'x': 0.25}
+            size_hint: 0.5, 0.5
+	
+        TextInput:
+            pos_hint: {'center_y': 0.445, 'center_x': 0.5}
+            size_hint: .3, 0.1
+            multiline: False
+            id: username
+            disabled : True
+            	    
+        TextInput:
+            pos_hint: {'center_y': 0.335, 'center_x': 0.5}
+            size_hint: .3, 0.1
+            multiline: False
+            hint_text: 'password'
+            id: password
+            focus: True
+            text: 'iPhone96#53'
+            write_tab: False
+            password: True
+            on_text_validate: root.authenticate_user()
+	    
+        Button:
+            pos_hint: {'center_y': 0.225, 'center_x': 0.5}
+            id: btn_login
+            size_hint: .3, 0.1
+            text: "Log in"
+            text_size: self.width, None
+            font_size: self.width * 0.09
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            background_normal: ''
+            background_color:  0.02, 0.431, 0.22, 1			#green
+            on_press:
+                root.authenticate_user()
+                #app.root.current = 'test_page'	    
+        Button:
+            pos_hint: {'center_y': 0.115, 'center_x': 0.5}
+            size_hint: .2, 0.1
+            text: "Not yet registered?"
+            text_size: self.width, None
+            font_size: self.width * 0.1
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            background_normal: ''
+            background_color:  0.055, 0.208, 0.396, 0
+            on_press:
+                app.root.current = 'register_page'
+                #app.root.current = 'add_schedule_item_page'
+                #app.root.current = 'test_page'
+        FloatLayout:
+            id: validation_layout
+            size_hint: 0.35, 1                                                   #User have to set pos_hint
+            pos_hint: {'center_y': 0.5, 'center_x': 0.8}  		
+
+	    
+<RegisterPage>:
+    FloatLayout:
+        pos_hint: {'center_y': 0.5, 'center_x': 0.5}
+        size_hint: 1, 1
+        canvas.before:
+            Color:
+                #rgba: get_color_from_hex('#a8a8a8')
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'images/landing_page_bg.jpg'
+
+        ImageButton:
+            source: 'icons/back.png'
+            pos_hint: {'y': .85, 'x': 0}
+            size_hint: 0.15, 0.15
+            on_press:
+                app.root.current = 'landing_page'
+		
+        Label:
+            text: 'User Registration'
+            id : title
+            pos_hint: {'center_y': 0.8, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.045
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1
+
+        TextInput:
+            pos_hint: {'center_y': 0.665, 'center_x': 0.5}
+            size_hint: .3, 0.1
+            multiline: False
+            hint_text: 'name'
+            id: name
+            write_tab: False
+            on_text_validate: root.register_user()
+
+        TextInput:
+            pos_hint: {'center_y': 0.555, 'center_x': 0.5}
+            size_hint: .3, 0.1
+            multiline: False
+            hint_text: 'email'
+            id: username
+            write_tab: False
+            on_text_validate: root.register_user()
+	    
+        TextInput:
+            pos_hint: {'center_y': 0.445, 'center_x': 0.5}
+            size_hint: .3, 0.1
+            multiline: False
+            hint_text: 'password'
+            id: password
+            write_tab: False
+            password: True
+            on_text_validate: root.register_user()
+	    
+        TextInput:
+            pos_hint: {'center_y': 0.335, 'center_x': 0.5}
+            size_hint: .3, 0.1
+            multiline: False
+            hint_text: 'confirm password'
+            id: confirm_password
+            write_tab: False
+            password: True
+            on_text_validate: root.register_user()
+        
+        Button:
+            pos_hint: {'center_y': 0.225, 'center_x': 0.5}
+            size_hint: .3, 0.1
+            text: "Register"
+            text_size: self.width, None
+            font_size: self.width * 0.09
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            background_normal: ''
+            background_color:  0.02, 0.431, 0.22, 1
+            on_press:
+                root.register_user()
+                #app.root.current = 'landing_page'	
+                
+        FloatLayout:
+            id: validation_layout
+            size_hint: 0.35, 1                                                   #User have to set pos_hint
+            pos_hint: {'center_y': 0.5, 'center_x': 0.8}  
+				
+<UserHomePage>:
+    FloatLayout:
+        pos_hint: {'center_y': 0.5, 'center_x': 0.5}
+        size_hint: 1, 1
+        canvas.before:
+            Color:
+                #rgba: get_color_from_hex('#a8a8a8')
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'images/landing_page_bg.jpg'
+
+        ImageButton:
+            source: 'icons/back.png'
+            pos_hint: {'y': .85, 'x': 0}
+            size_hint: 0.15, 0.15
+            on_press:
+                app.root.current = 'landing_page'
+
+        ImageButton:
+            source: 'icons/logout.png'
+            pos_hint: {'y': .85, 'x': 0.85}
+            size_hint: 0.15, 0.15
+            on_press:
+                app.show_log_out()
+
+		    
+        Label:
+            text: 'User Home'
+            pos_hint: {'center_y': 0.95, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.038
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1
+	    
+        BoxLayout:
+            orientation: 'vertical'
+            id: side navbar
+            size_hint : (0.08,0.3)
+            pos_hint: {'center_y':0.75, 'center_x': 0.05}
+            ImageButton:
+                source : 'icons/greenhouses_selected.png'
+                disabled : True
+            ImageButton:
+                source : 'icons/help.png'
+                on_release : 
+                    root.select_help()
+        ScrollView:
+            #size : (500,320)
+            pos_hint: {'center_y': 0.41, 'center_x': 0.5}                
+            size_hint: 0.8, 0.75
+            do_scroll_x : False	    
+            id : scroll
+            
+<GreenhouseHomePage>:
+    FloatLayout:
+        pos_hint: {'center_y': 0.5, 'center_x': 0.5}
+        size_hint: 1, 1
+        canvas.before:
+            Color:
+                #rgba: get_color_from_hex('#a8a8a8')
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'images/landing_page_bg.jpg'
+
+        ImageButton:
+            source: 'icons/back.png'
+            pos_hint: {'y': .85, 'x': 0}
+            size_hint: 0.15, 0.15
+            on_press:
+                app.root.current = 'landing_page'
+
+        ImageButton:
+            source: 'icons/logout.png'
+            pos_hint: {'y': .85, 'x': 0.85}
+            size_hint: 0.15, 0.15
+            on_press:
+                app.show_log_out()
+
+		    
+        Label:
+            text: 'Greenhouse Home'
+            pos_hint: {'center_y': 0.95, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.038
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+	    
+        BoxLayout:
+            orientation: 'vertical'
+            id: side navbar
+            size_hint : (0.08,0.3)
+            pos_hint: {'center_y':0.75, 'center_x': 0.05}
+            ImageButton:
+                source : 'icons/greenhouses_selected.png'
+                disabled : True
+            ImageButton:
+                source : 'icons/help.png'
+                on_release : 
+                    root.select_help()
+                
+        MyAddButton:
+            text: "Add greenhouse"
+            on_press:
+                app.root.current = 'add_greenhouse_page'            
+        ScrollView:
+            #size : (500,320)
+            pos_hint: {'center_y': 0.41, 'center_x': 0.5}                
+            size_hint: 0.8, 0.75
+            do_scroll_x : False	    
+            id : scroll
+
+		    
+<AddGreenhousePage>:
+    FloatLayout:
+        pos_hint: {'center_y': 0.5, 'center_x': 0.5}
+        size_hint: 1, 1
+        canvas.before:
+            Color:
+                #rgba: get_color_from_hex('#a8a8a8')
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'images/landing_page_bg.jpg'
+
+        ImageButton:
+            source: 'icons/back.png'
+            pos_hint: {'y': .85, 'x': 0}
+            size_hint: 0.15, 0.15
+            on_press:
+                app.root.current = 'greenhouse_home_page'
+		
+        Label:
+            text: 'Add greenhouse'
+            id: lbl_add
+            pos_hint: {'center_y': 0.8, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.07
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1
+
+        TextInput:
+            pos_hint: {'center_y': 0.555, 'center_x': 0.5}
+            size_hint: .3, 0.1
+            multiline: False
+            hint_text: 'greenhouse nickname'
+            id: greenhouse_nickname
+            write_tab: False
+            on_text_validate: root.add_greenhouse()
+	    
+        Label:
+            text: 'metres'
+            pos_hint: {'center_y': 0.445, 'center_x': 0.55}
+            text_size: self.width, None
+            font_size: self.width * 0.02
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            color: 1, 1, 1, 1 
+            
+        TextInput:
+            pos_hint: {'center_y': 0.445, 'center_x': 0.425}
+            size_hint: .15, 0.1
+            multiline: False
+            hint_text: 'length'
+            id: length
+            write_tab: False
+            on_text_validate: root.add_greenhouse()
+            input_filter : 'float'
+            
+        Label:
+            text: 'metres'
+            pos_hint: {'center_y': 0.335, 'center_x': 0.55}
+            text_size: self.width, None
+            font_size: self.width * 0.02
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            color: 1, 1, 1, 1 	
+                
+        TextInput:
+            pos_hint: {'center_y': 0.335, 'center_x': 0.425}
+            size_hint: .15, 0.1
+            multiline: False
+            hint_text: 'width'
+            id: width
+            write_tab: False
+            on_text_validate: root.add_greenhouse()
+            input_filter : 'float'
+        
+        MyAddButton:
+            pos_hint: {'center_y': 0.225, 'center_x': 0.5}
+            id : add
+            text: "Add"
+            on_press:
+                root.add_greenhouse()
+                #app.root.current = 'landing_page'	
+        FloatLayout:
+            id: validation_layout
+            size_hint: 0.35, 1                                                   #User have to set pos_hint
+            pos_hint: {'center_y': 0.5, 'center_x': 0.8}          
+        BoxLayout:
+            orientation: 'vertical'
+            id: side navbar
+            size_hint : (0.08,0.2)
+            pos_hint: {'center_y':0.75, 'center_x': 0.05}
+            
+            ImageButton:
+                source : 'icons/greenhouses.png'
+                #disabled : True
+                on_press:
+                    app.root.current = 'greenhouse_home_page'
+<DeviceHomePage>:
+    FloatLayout:
+        pos_hint: {'center_y': 0.5, 'center_x': 0.5}
+        id: container
+        size_hint: 1, 1
+        canvas.before:
+            Color:
+                #rgba: get_color_from_hex('#a8a8a8')
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'images/landing_page_bg.jpg'
+
+        ImageButton:
+            source: 'icons/back.png'
+            pos_hint: {'y': .85, 'x': 0}
+            size_hint: 0.15, 0.15
+            on_press:
+                app.root.current = 'greenhouse_home_page'
+
+        ImageButton:
+            source: 'icons/logout.png'
+            pos_hint: {'y': .85, 'x': 0.85}
+            size_hint: 0.15, 0.15
+            on_press:
+                app.show_log_out()
+
+		    
+        Label:
+            id : device_title
+            pos_hint: {'center_y': 0.95, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.045
+            halign: 'center'
+            valign: 'middle'
+            text : 'Device Home'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1
+
+
+        BoxLayout:
+            orientation: 'vertical'
+            id: side navbar
+            size_hint : (0.08,0.35)
+            pos_hint: {'center_y':0.65, 'center_x': 0.05}
+            
+            ImageButton:
+                source : 'icons/greenhouses.png'
+                on_press:
+                    app.root.current = 'greenhouse_home_page'
+            ImageButton:
+                source : 'icons/devices_selected.png'
+                disabled : True
+            ImageButton:
+                source : 'icons/help.png'
+                on_release : 
+                    root.select_help()
+        
+        MyAddButton:
+            text: "Add device"
+            pos_hint: {'center_y': 0.85, 'center_x': 0.5}
+
+            on_press:
+                app.root.current = 'add_device_page'
+			        
+        ScrollView:
+            #size : (500,320)
+            pos_hint: {'center_y': 0.41, 'center_x': 0.5}                
+            size_hint: 0.8, 0.75
+            do_scroll_x : False	    
+            id : scroll
+
+
+<CustomSpinnerOption@SpinnerOption>:
+    #background_normal: ''
+    #background_color:  0.02, 0.431, 0.22, 1 
+
+<AddDevicePage>:
+    FloatLayout:
+        pos_hint: {'center_y': 0.5, 'center_x': 0.5}
+        size_hint: 1, 1
+        canvas.before:
+            Color:
+                #rgba: get_color_from_hex('#a8a8a8')
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'images/landing_page_bg.jpg'
+
+        ImageButton:
+            source: 'icons/back.png'
+            pos_hint: {'y': .85, 'x': 0}
+            size_hint: 0.15, 0.15
+            on_press:
+                app.root.current = 'device_home_page'
+		
+        Label:
+            text: 'Add a device'
+            id: lbl_add
+            pos_hint: {'center_y': 0.9, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.07
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1
+
+        TextInput:
+            pos_hint: {'center_y': 0.765, 'center_x': 0.5}
+            size_hint: .3, 0.1
+            multiline: False
+            hint_text: 'pi id'
+            id: pi_id
+            write_tab: False
+            on_text_validate: root.add_device()
+
+        TextInput:
+            pos_hint: {'center_y': 0.655, 'center_x': 0.44}
+            size_hint: .18, 0.1
+            multiline: False
+            hint_text: 'default threshold'
+            id: threshold
+            write_tab: False
+            on_text_validate: root.add_device()
+            input_filter : 'float'
+        
+        Button:
+            pos_hint: {'center_y': 0.655, 'center_x': 0.65}
+            size_hint: .2, 0.1
+            text: "Click here for more information"
+            text_size: self.width, None
+            font_size: self.width * 0.1
+            valign: 'middle'
+            size: self.texture_size
+            background_normal: ''
+            background_color:  0.055, 0.208, 0.396, 0
+            on_press:
+                #app.root.current = 'register_page'
+                #app.root.current = 'add_schedule_item_page'
+                #app.root.current = 'test_page'
+
+        Label:
+            text: 'Automatic Irrigation'
+            pos_hint: {'center_y': 0.575, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.02
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1
+	    
+        ToggleButton:
+            pos_hint: {'center_y': 0.52, 'center_x': 0.425}
+            id : auto
+            size_hint: .15, 0.08
+            text: "yes"
+            text_size: self.width, None
+            font_size: self.width * 0.18
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            background_normal: ''
+            #background_color:  0.02, 0.431, 0.22, 1
+            #background_color:  0.5, 0.5 ,0.5, 1
+            background_color:  0.2, 0.7 ,0.2, 1
+            group: 'irrigation'
+            state:  'down'
+            on_press:
+                root.toggle_state(root.ids.auto.text)
+        ToggleButton:
+            pos_hint: {'center_y': 0.52, 'center_x': 0.575}
+            id : manual
+            size_hint: .15, 0.08
+            text: "no"
+            text_size: self.width, None
+            font_size: self.width * 0.18
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            background_normal: ''
+            #background_color:  0.02, 0.431, 0.22, 1
+            #background_color:  0.753,0.188,0.059 ,  1
+            background_color:  0.2, 0.7 ,0.2, 1
+            group: 'irrigation'
+            state:  'normal'
+            on_press:
+                root.toggle_state(root.ids.manual.text)
+	    	    
+
+        Spinner:
+            size_hint: .3, 0.1
+            id: plants
+            #size: 100, 44
+            pos_hint: {'center_y': 0.42, 'center_x': 0.5}
+            text: 'Choose plant'
+            text_size: self.width, None
+            font_size: self.width * 0.08
+            halign: 'center'
+            valign: 'middle'
+            background_normal: ''
+            background_color:  0.2, 0.7 ,0.2, 1
+            #values: root.plant_names         
+            option_cls: Factory.get("CustomSpinnerOption")
+            
+        Label:
+            text: 'Date planted:'
+            pos_hint: {'center_y': 0.35, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.02
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1 
+        
+        Spinner:
+            size_hint: .15, 0.1
+            id: day
+            #size: 100, 44
+            pos_hint: {'center_y': 0.275, 'center_x': 0.3}
+            text: 'day'
+            text_size: self.width, None
+            font_size: self.width * 0.13
+            halign: 'center'
+            valign: 'middle'
+            background_normal: ''
+            background_color:  0.2, 0.7 ,0.2, 1   
+            option_cls: Factory.get("CustomSpinnerOption")
+               
+        Spinner:
+            size_hint: .2, 0.1
+            id: month
+            #size: 100, 44
+            pos_hint: {'center_y': 0.275, 'center_x': 0.5}
+            text: 'month'
+            text_size: self.width, None
+            font_size: self.width * 0.1
+            halign: 'center'
+            valign: 'middle'
+            background_normal: ''
+            background_color:  0.2, 0.7 ,0.2, 1   
+            option_cls: Factory.get("CustomSpinnerOption")
+            
+        Spinner:
+            size_hint: .15, 0.1
+            id: year
+            #size: 100, 44
+            pos_hint: {'center_y': 0.275, 'center_x': 0.7}
+            text: 'year'
+            text_size: self.width, None
+            font_size: self.width * 0.13
+            halign: 'center'
+            valign: 'middle'
+            background_normal: ''
+            background_color:  0.2, 0.7 ,0.2, 1   
+            option_cls: Factory.get("CustomSpinnerOption")  
+            
+        BoxLayout:
+            orientation: 'vertical'
+            id: side navbar
+            size_hint : (0.08,0.3)
+            pos_hint: {'center_y':0.65, 'center_x': 0.05}
+            
+            ImageButton:
+                source : 'icons/greenhouses.png'
+                on_press:
+                    app.root.current = 'greenhouse_home_page'
+            ImageButton:
+                source : 'icons/devices.png'
+                on_press:
+                    app.root.current = 'device_home_page'
+        MyAddButton:
+            pos_hint: {'center_y': 0.15, 'center_x': 0.5}
+            text: "Add"
+            id : add
+            on_press:
+                root.add_device()
+                #app.root.current = 'landing_page'			
+        FloatLayout:
+            id: validation_layout
+            size_hint: 0.35, 1                                                   #User have to set pos_hint
+            pos_hint: {'center_y': 0.5, 'center_x': 0.8}  
+<DeviceDashboardPage>:
+    FloatLayout:
+        pos_hint: {'center_y': 0.5, 'center_x': 0.5}
+        id: float
+        size_hint: 1, 1
+        canvas.before:
+            Color:
+                #rgba: get_color_from_hex('#a8a8a8')
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'images/landing_page_bg.jpg'
+
+        ImageButton:
+            source: 'icons/back.png'
+            pos_hint: {'y': .85, 'x': 0}
+            size_hint: 0.15, 0.15
+            on_press:
+                app.root.current = 'device_home_page'
+
+        ImageButton:
+            source: 'icons/logout.png'
+            pos_hint: {'y': .85, 'x': 0.85}
+            size_hint: 0.15, 0.15
+            on_press:
+                app.show_log_out()
+
+		    
+        Label:
+            id : dashboard_title
+            pos_hint: {'center_y': 0.95, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.045
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1
+        Label:
+            id : dashboard_page_title
+            pos_hint: {'center_y': 0.89, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.035
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1
+        Label:
+            id : last_updated
+            text: 'last updated : Never'
+            pos_hint: {'center_y': 0.85, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.025
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1
+	    
+            
+        BoxLayout:
+            orientation: 'vertical'
+            id: side navbar
+            size_hint : (0.08,0.4)
+            pos_hint: {'center_y':0.65, 'center_x': 0.05}
+            
+            ImageButton:
+                source : 'icons/greenhouses.png'
+                on_press:
+                    app.root.current = 'greenhouse_home_page'
+            ImageButton:
+                source : 'icons/devices.png'
+                on_press:
+                    app.root.current = 'device_home_page'
+            ImageButton:
+                source : 'icons/dashboard_selected.png'
+                disabled : True
+                on_press:
+                    app.root.current = 'device_dashboard_page'
+
+            ImageButton:
+                source : 'icons/help.png'
+                on_release : 
+                    root.select_help()
+
+             
+        FloatLayout:
+            pos_hint: {'center_y': 0.43, 'center_x': 0.5}
+            id: container
+            size_hint: 0.8, 0.8
+            canvas.before:
+                Color:
+                    rgba: 0.2, 0.2, 0.2, .8
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+                
+                
+<TestPage>:
+    FloatLayout:
+        pos_hint: {'center_y': 0.5, 'center_x': 0.5}
+        id: float
+        size_hint: 1, 1
+        canvas.before:
+            Color:
+                #rgba: get_color_from_hex('#a8a8a8')
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'images/landing_page_bg.jpg'
+                #source: 'images/landing_page_bg.jpg'
+
+        ImageButton:
+            source: 'icons/back.png'
+            pos_hint: {'y': .85, 'x': 0}
+            size_hint: 0.15, 0.15
+            on_press:
+                app.root.current = 'device_home_page'
+
+        ImageButton:
+            source: 'icons/logout.png'
+            pos_hint: {'y': .85, 'x': 0.85}
+            size_hint: 0.15, 0.15
+            on_press:
+                app.show_log_out()
+
+		    
+        Label:
+            id : dashboard_title
+            pos_hint: {'center_y': 0.95, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.045
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1
+        Label:
+            id : dashboard_page_title
+            pos_hint: {'center_y': 0.89, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.035
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1
+        Label:
+            id : last_updated
+            text: 'last updated : Never'
+            pos_hint: {'center_y': 0.85, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.025
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1
+	    
+
+               
+        FloatLayout:
+            pos_hint: {'center_y': 0.43, 'center_x': 0.5}
+            id: container
+            size_hint: 0.8, 0.8
+            canvas.before:
+                Color:
+                    rgba: 0.2, 0.2, 0.2, .8
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+
+
+<AddEditAlertPage>:
+    FloatLayout:
+        pos_hint: {'center_y': 0.5, 'center_x': 0.5}
+        size_hint: 1, 1
+        id : main_layout
+        canvas.before:
+            Color:
+                #rgba: get_color_from_hex('#a8a8a8')
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'images/landing_page_bg.jpg'
+    
+        ImageButton:
+            source: 'icons/back.png'
+            pos_hint: {'y': .85, 'x': 0}
+            size_hint: 0.15, 0.15
+            on_press:
+                app.root.current = 'device_home_page'   
+    
+        Label:
+            text: 'Add alert'
+            id : title
+            pos_hint: {'center_y': 0.85, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.07
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1
+    
+        Spinner:
+            size_hint: .3, 0.1
+            id: sensor
+            #size: 100, 44
+            pos_hint: {'center_y': 0.72, 'center_x': 0.5}
+            text: 'Choose sensor'
+            text_size: self.width, None
+            font_size: self.width * 0.08
+            halign: 'center'
+            valign: 'middle'
+            background_normal: ''
+            background_color:  0.2, 0.7 ,0.2, 1   
+            option_cls: Factory.get("CustomSpinnerOption")
+        
+        
+        Label:
+            text: 'Alert user:'
+            pos_hint: {'center_y': 0.63, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.02
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1
+        
+        ToggleButton:
+            pos_hint: {'center_y': 0.575, 'center_x': 0.425}
+            id : once
+            size_hint: .15, 0.08
+            text: "Once-off"
+            text_size: self.width, None
+            font_size: self.width * 0.18
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            background_normal: ''
+            #background_color:  0.02, 0.431, 0.22, 1
+            #background_color:  0.5, 0.5 ,0.5, 1
+            background_color:  0.2, 0.7 ,0.2, 1
+            group: 'recurring'
+            state:  'down'
+            on_press:
+                root.toggle_state(root.ids.once.text)
+        ToggleButton:
+            pos_hint: {'center_y': 0.575, 'center_x': 0.575}
+            id : recurring
+            size_hint: .15, 0.08
+            text: "Every time"
+            text_size: self.width, None
+            font_size: self.width * 0.18
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            background_normal: ''
+            #background_color:  0.02, 0.431, 0.22, 1
+            #background_color:  0.753,0.188,0.059 ,  1
+            background_color:  0.2, 0.7 ,0.2, 1
+            group: 'recurring'
+            state:  'normal'
+            on_press:
+                root.toggle_state(root.ids.recurring.text)
+        Label:
+            text: 'When value is:'
+            pos_hint: {'center_y': 0.5, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.02
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1
+        
+        ToggleButton:
+            pos_hint: {'center_y': 0.45, 'center_x': 0.425}
+            id : less
+            size_hint: .15, 0.08
+            text: "Less than"
+            text_size: self.width, None
+            font_size: self.width * 0.18
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            background_normal: ''
+            #background_color:  0.02, 0.431, 0.22, 1
+            #background_color:  0.5, 0.5 ,0.5, 1
+            background_color:  0.2, 0.7 ,0.2, 1
+            group: 'operator'
+            state:  'down'
+            on_press:
+                root.toggle_state(root.ids.less.text)
+        ToggleButton:
+            pos_hint: {'center_y': 0.45, 'center_x': 0.575}
+            id : more
+            size_hint: .15, 0.08
+            text: "More than"
+            text_size: self.width, None
+            font_size: self.width * 0.18
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            background_normal: ''
+            #background_color:  0.02, 0.431, 0.22, 1
+            #background_color:  0.753,0.188,0.059 ,  1
+            background_color:  0.2, 0.7 ,0.2, 1
+            group: 'operator'
+            state:  'normal'
+            on_press:
+                root.toggle_state(root.ids.more.text)
+                
+        TextInput:
+            pos_hint: {'center_y': 0.335, 'center_x': 0.5}
+            size_hint: .3, 0.1
+            multiline: False
+            hint_text: 'sensor value'
+            id: value
+            write_tab: False
+            valign: 'middle'
+            input_filter : 'float'
+            on_text_validate: root.add_alert()
+        
+        MyAddButton:
+            pos_hint: {'center_y': 0.225, 'center_x': 0.5}
+            text: "Add"
+            id : add
+            on_press:
+                root.add_alert()
+                #app.root.current = 'landing_page'
+        FloatLayout:
+            id: validation_layout
+            size_hint: 0.35, 1                                                   #User have to set pos_hint
+            pos_hint: {'center_y': 0.5, 'center_x': 0.8}      
+            
+        BoxLayout:
+            orientation: 'vertical'
+            id: side navbar
+            size_hint : (0.08,0.3)
+            pos_hint: {'center_y':0.65, 'center_x': 0.05}
+            
+            ImageButton:
+                source : 'icons/greenhouses.png'
+                on_press:
+                    app.root.current = 'greenhouse_home_page'
+            ImageButton:
+                source : 'icons/devices.png'
+                on_press:
+                    app.root.current = 'device_home_page'
+            ImageButton:
+                source : 'icons/dashboard.png'
+                on_press:
+                    app.root.current = 'device_dashboard_page'
+
+<AddScheduleItemPage>:
+    FloatLayout:
+        pos_hint: {'center_y': 0.5, 'center_x': 0.5}
+        size_hint: 1, 1
+        id : main_layout
+        canvas.before:
+            Color:
+                #rgba: get_color_from_hex('#a8a8a8')
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'images/landing_page_bg.jpg'
+    
+        ImageButton:
+            source: 'icons/back.png'
+            pos_hint: {'y': .85, 'x': 0}
+            size_hint: 0.15, 0.15
+            on_press:
+                app.root.current = 'device_home_page'   
+    
+        Label:
+            text: 'Add Irrigation Schedule'
+            id : title
+            pos_hint: {'center_y': 0.85, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.07
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1
+            
+        Label:
+            text: 'Date:'
+            pos_hint: {'center_y': 0.72, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.02
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1 
+        
+        Spinner:
+            size_hint: .15, 0.1
+            id: day
+            #size: 100, 44
+            pos_hint: {'center_y': 0.65, 'center_x': 0.3}
+            text: 'day'
+            text_size: self.width, None
+            font_size: self.width * 0.13
+            halign: 'center'
+            valign: 'middle'
+            background_normal: ''
+            background_color:  0.2, 0.7 ,0.2, 1   
+            option_cls: Factory.get("CustomSpinnerOption")
+               
+        Spinner:
+            size_hint: .2, 0.1
+            id: month
+            #size: 100, 44
+            pos_hint: {'center_y': 0.65, 'center_x': 0.5}
+            text: 'month'
+            text_size: self.width, None
+            font_size: self.width * 0.1
+            halign: 'center'
+            valign: 'middle'
+            background_normal: ''
+            background_color:  0.2, 0.7 ,0.2, 1   
+            option_cls: Factory.get("CustomSpinnerOption")
+            
+        Spinner:
+            size_hint: .15, 0.1
+            id: year
+            #size: 100, 44
+            pos_hint: {'center_y': 0.65, 'center_x': 0.7}
+            text: 'year'
+            text_size: self.width, None
+            font_size: self.width * 0.13
+            halign: 'center'
+            valign: 'middle'
+            background_normal: ''
+            background_color:  0.2, 0.7 ,0.2, 1   
+            option_cls: Factory.get("CustomSpinnerOption")     
+            
+        Label:
+            text: 'Time:'
+            pos_hint: {'center_y': 0.57, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.02
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1 
+            
+        TextInput:
+            pos_hint: {'center_y': 0.5, 'center_x': 0.4}
+            size_hint: .1, 0.1
+            multiline: False
+            hint_text: 'hh'
+            id: hour
+            write_tab: False
+            halign: 'center'
+            valign: 'middle'
+            input_filter : 'int'  
+            
+        Label:
+            text: ':'
+            pos_hint: {'center_y': 0.5, 'center_x': 0.46}
+            text_size: self.width, None
+            font_size: self.width * 0.02
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1 
+            
+        TextInput:
+            pos_hint: {'center_y': 0.5, 'center_x': 0.52}
+            size_hint: .1, 0.1
+            multiline: False
+            hint_text: 'mm'
+            id: minute
+            write_tab: False
+            halign: 'center'
+            valign: 'middle'
+            input_filter : 'int'   
+            
+        Spinner:
+            size_hint: .1, 0.1
+            id: period
+            #size: 100, 44
+            pos_hint: {'center_y': 0.5, 'center_x': 0.63}
+            text : 'am'
+            text_size: self.width, None
+            font_size: self.width * 0.2
+            values : ['am','pm']
+            halign: 'center'
+            valign: 'middle'
+            background_normal: ''
+            background_color:  0.2, 0.7 ,0.2, 1   
+            option_cls: Factory.get("CustomSpinnerOption")
+            
+        Label:
+            text: 'Option:'
+            pos_hint: {'center_y': 0.42, 'center_x': 0.5}
+            text_size: self.width, None
+            font_size: self.width * 0.02
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1 
+            
+        Spinner:
+            size_hint: .13, 0.1
+            id: option_spinner
+            #size: 100, 44
+            pos_hint: {'center_y': 0.35, 'center_x': 0.45}
+            text : 'choose'
+            text_size: self.width, None
+            font_size: self.width * 0.15
+            values : ['duration','threshold']
+            halign: 'center'
+            valign: 'middle'
+            background_normal: ''
+            background_color:  0.2, 0.7 ,0.2, 1   
+            option_cls: Factory.get("CustomSpinnerOption")
+            on_text:
+                root.on_spinner_select(self.text)
+                
+        TextInput:
+            pos_hint: {'center_y': 0.35, 'center_x': 0.58}
+            size_hint: .1, 0.1
+            multiline: False
+            id: option_value
+            disabled : True
+            write_tab: False
+            halign: 'center'
+            valign: 'middle'
+            input_filter : 'int' 
+            
+        Label:
+            text: ''
+            id: option_lbl
+            pos_hint: {'center_y': 0.35, 'center_x': 0.65}
+            text_size: self.width, None
+            font_size: self.width * 0.02
+            halign: 'center'
+            valign: 'middle'
+            size: self.texture_size
+            #color: 0.02, 0.431, 0.22, 1 
+            
+
+
+        MyAddButton:
+            pos_hint: {'center_y': 0.1, 'center_x': 0.5}
+            
+            text: "Add"
+            id : add
+            on_press:
+                root.add_schedule_item()
+                
+        BoxLayout:
+            orientation: 'vertical'
+            id: side navbar
+            size_hint : (0.08,0.3)
+            pos_hint: {'center_y':0.65, 'center_x': 0.05}
+            
+            ImageButton:
+                source : 'icons/greenhouses.png'
+                on_press:
+                    app.root.current = 'greenhouse_home_page'
+            ImageButton:
+                source : 'icons/devices.png'
+                on_press:
+                    app.root.current = 'device_home_page'
+            ImageButton:
+                source : 'icons/dashboard.png'
+                on_press:
+                    app.root.current = 'device_dashboard_page'
+                
+        FloatLayout:
+            id: validation_layout
+            size_hint: 0.35, 1                                                   #User have to set pos_hint
+            pos_hint: {'center_y': 0.5, 'center_x': 0.9}    
+		    
+<LogoutPage>:
+    FloatLayout:
+        pos_hint: {'center_y': 0.5, 'center_x': 0.5}
+        size_hint: 1, 1
+        canvas.before:
+            Color:
+                #rgba: get_color_from_hex('#a8a8a8')
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'images/landing_page_bg.jpg'
+
+        GridLayout:
+            cols: 1
+            rows: 1
+            id: grid
+            size_hint: 0.8, 0.8
+            padding: 5,5
+            spacing: 5,5
+            pos_hint: {'center_y': 0.45, 'center_x': 0.5}
+            canvas:
+                Color:
+                    rgba: get_color_from_hex('#b97b3d')
+                Rectangle:
+                    pos: self.pos
+                    size: self.size

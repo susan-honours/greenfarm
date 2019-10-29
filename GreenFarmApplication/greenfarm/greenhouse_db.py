@@ -2,6 +2,8 @@ from pymongo import MongoClient, errors
 from datetime import datetime, timedelta
 import random
 from dateutil.tz import tzutc
+from bson import ObjectId
+
 class GreenhouseDb():
     def __init__(self):
         client = MongoClient("mongodb+srv://pi3:1234@cluster0-qbhqv.gcp.mongodb.net/test?retryWrites=true&w=majority")
@@ -19,11 +21,6 @@ class GreenhouseDb():
         return(self.get_users())
     
     def update_user(self,_id,user_email,user_password, user_name):
-        # db = {}
-        # db['email'] = user_email
-        # db['password'] = user_password
-        # db['name'] = user_name
-        # db['tmp_password'] = True
         self.greenhouse_data.user.update_one(
 	                                              {'_id': _id}, 
 						      {
@@ -57,6 +54,8 @@ class GreenhouseDb():
         for greenhouse in user_greenhouses:
             greenhouse_devices = self.get_greenhouse_devices(greenhouse['_id'])
             for device in greenhouse_devices:
+                self.remove_pi_alerts(device['_id'])
+                self.remove_pi_schedule(device['_id'])                  
                 self.remove_device(device['_id'])
             self.remove_greenhouse(greenhouse['_id'])
         
@@ -107,7 +106,7 @@ class GreenhouseDb():
         return self.get_greenhouse(greenhouse['_id'])
 
 #device functions
-    def add_device(self,pi_id, irrigation_mode, threshold, plant, dt_planted, greenhouse_id):
+    def add_device(self,pi_id, irrigation_mode, threshold, plant, dt_planted, greenhouse_id, email):
         db = {}
         db['pi_id'] = pi_id
         db['solenoid_valve'] =  0
@@ -117,6 +116,7 @@ class GreenhouseDb():
         db['threshold'] = threshold
         db['busy'] = None
         db['greenhouse_id'] = greenhouse_id
+        db['email'] = email
         #db['timestamps'] = []
 	
         return self.greenhouse_data.device.insert_one(db)
@@ -429,7 +429,14 @@ class GreenhouseDb():
         else:
             return None							 #return None if list is empty
 
-
+    def remove_alert(self,_id):
+        alert_dict = self.greenhouse_data.alert.delete_one({ "_id": _id })
+        return alert_dict
+        
+    def remove_pi_alerts(self,pi_id):
+        alert_dict= self.greenhouse_data.alert.delete_many({"pi_id": pi_id})
+        return alert_dict        
+ 
     def get_alerts(self, sensor, pi_id):
         result = self.greenhouse_data.alert.aggregate([
 	    {
@@ -465,16 +472,6 @@ class GreenhouseDb():
                                                           }
 						      )
 
-    # def update_alert_state(self, alert):        
-        # self.greenhouse_data.alert.update_one(
-	                                         # {'ts': alert['ts']},
-                                             # {'pi_id' : alert['pi_id']}, 
-						 # {
-						  # "$set":                                  
-						         # { "active": alert['active']},                                  
-						 # }
-						# )
-        # return self.get_alert(user['email'])
 
 
     def add_alert(self, email,pi_id,recurring, greater_than, sensor, value ):
@@ -491,6 +488,7 @@ class GreenhouseDb():
 	
         return self.greenhouse_data.alert.insert_one(db)
 
+
     def add_schedule_item(self, ts, duration, threshold, email, pi_id):
         db = {}
         db['created'] = datetime.utcnow()
@@ -505,6 +503,10 @@ class GreenhouseDb():
     def get_schedule(self, pi_id):
         schedule_dict= self.greenhouse_data.schedule_item.find({"pi_id": pi_id}).sort("ts")
         return list(schedule_dict)
+
+    def remove_pi_schedule(self,pi_id):
+        schedule_dict= self.greenhouse_data.schedule_item.delete_many({"pi_id": pi_id})
+        return schedule_dict
     
     def remove_schedule_item(self,_id):
         schedule_dict = self.greenhouse_data.schedule_item.delete_one({"_id": _id})
@@ -532,7 +534,7 @@ class GreenhouseDb():
                             {'plant_id': 2 , 'plant' :'pumpkin','days': 108},
                             {'plant_id': 3 , 'plant' :'pepper','days':75}, 
                             {'plant_id': 4 , 'plant' :'pea','days': 90}, 
-                            {'plant_id': 5 , 'plant' :'patato','days': 70},
+                            {'plant_id': 5 , 'plant' :'potato','days': 70},
                             {'plant_id': 6 , 'plant' :'corn','days': 80}, 
                             {'plant_id': 7 , 'plant' :'tomato','days': 45},
                             {'plant_id': 8 , 'plant' :'brocolli','days': 125},
@@ -553,9 +555,16 @@ class GreenhouseDb():
   
         
 if __name__ == "__main__":
-    x = GreenhouseDb() 
-    x.add_plants()
-    x.add_schedule_states() 
+    x = GreenhouseDb()
+    
+    
+
+
+    
+    
+     
+    # x.add_plants()
+    #x.add_schedule_states() 
        
     #print(plants)
     
@@ -576,18 +585,25 @@ if __name__ == "__main__":
     # x.add_schedule_item(created, ts, duration, threshold, email, pi_id)
     
     
-    
-    end_date = datetime.utcnow() + timedelta(days=5)
+    end_date = datetime.utcnow() 
     #50 days
-    for i in range(10):
+    for i in range(50):
 	#24 each day
         for j in range(24):
-            x.simulate_data('rp3001', end_date - timedelta(hours=j))
-            print(i)
+            x.simulate_data('rp3002', end_date - timedelta(hours=j))
+	    
+        end_date = end_date - timedelta(days=1)
+
+    end_date = datetime.utcnow() 
+    
+    for i in range(50):
+	#24 each day
+        for j in range(24):
+            x.simulate_data('rp3003', end_date - timedelta(hours=j))
 	    
         end_date = end_date - timedelta(days=1)
     
-    
+            
     # 
     # print(x.get_weekly_data(start_date, end_date, 'test1',3))
     # lst_pi_ids = []

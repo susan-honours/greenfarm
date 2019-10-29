@@ -167,15 +167,7 @@ class MyCustomWhiteBox(BoxLayout):
         self.rect.size = instance.size
     pass        
         
-class ConfirmPopup(GridLayout):
-	text = StringProperty()
-	
-	def __init__(self,**kwargs):
-		self.register_event_type('on_answer')
-		super(ConfirmPopup,self).__init__(**kwargs)
-		
-	def on_answer(self, *args):
-		pass		
+
 
 #Home page: register / login buttons    
 class LandingPage(Screen):
@@ -256,6 +248,7 @@ class RegisterPage(Screen):
             self.ids.confirm_password.size_hint = (0,0)
             self.ids.password.hint_text = 'temporary password'
             self.ids.username.text = self.app.selected_user['email']
+            self.ids.username.disabled = True
             self.ids.name.text = self.app.selected_user['name']
             self.ids.title.text = 'Update user'
         
@@ -267,8 +260,52 @@ class RegisterPage(Screen):
             Clock.schedule_once(self.pop.dismiss,0.5)
         else:
             self.pop = self.app.please_wait('Registering user')
-            self.pop.open() 
-            Clock.schedule_once(self.handle_register, 0.5)
+            self.pop.open()
+            if(self.ids.title.text == 'Update user'):
+                Clock.schedule_once(self.handle_update,0.5)
+            else:
+                Clock.schedule_once(self.handle_register, 0.5)
+
+    def handle_update(self,*args):
+        validation_layout = self.ids.validation_layout
+        validation_layout.clear_widgets()    
+        is_valid = True   
+        
+        password = self.ids.password.text 
+        username = self.ids.username.text 
+        name = self.ids.name.text 
+        
+        if(name==''):
+            is_valid = False
+            validation_layout.add_widget(
+                                                  MyValidationLabel(text = '* Type in your name.',
+                                                                    pos_hint= {'center_y': 0.665, 'center_x': 0.5})
+                                                )
+        valid_password = self.validate_password(password)
+        if(not valid_password):
+            is_valid = False
+            validation_layout.add_widget(
+                                          MyValidationLabel(text = '* Password must be a length 6 to 12 characters.\nIt should contain at least:\n - 1 lowercase\n- 1 uppercase \n - 1 numeric \n - 1 special character',
+                                                        pos_hint= {'center_y': 0.400, 'center_x': 0.5})
+                         )                
+
+             
+        try:
+            self.pop.dismiss() 
+            if(is_valid):
+                    hash_password =  sha256_crypt.hash(password)
+                    self.app.db.update_user(self.app.selected_user['_id'],self.app.selected_user['email'],password,name)
+                    self.app.root.current = 'user_home_page'
+                    self.pop = self.app.success('User successfully updated', 'User updated in the database')
+                    self.pop.open() 
+        except:
+            self.pop.dismiss()
+            print('error 314')
+            self.app.db_connection_error('User not registered...') 
+
+    def validate_password(self, password):
+        password_regex = '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})'  #medium strength  #https://www.thepolyglotdeveloper.com/2015/05/use-regex-to-test-password-strength-in-javascript/
+        return re.search(password_regex,password) 
             
     def handle_register(self, *args):        
         validation_layout = self.ids.validation_layout
@@ -281,8 +318,7 @@ class RegisterPage(Screen):
                 
         email_regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
         valid_email = re.search(email_regex,username)        
-        password_regex = '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})'  #medium strength  #https://www.thepolyglotdeveloper.com/2015/05/use-regex-to-test-password-strength-in-javascript/
-        valid_password = re.search(password_regex,password) 
+        valid_password = self.validate_password(password)
         
         if(name==''):
             is_valid = False
@@ -292,7 +328,7 @@ class RegisterPage(Screen):
                                                 )
         
         if(valid_email):
-            if(valid_password and self.ids.title.text == 'User Registration'):                 
+            if(valid_password):                 
                 if(password != self.ids.confirm_password.text):
                     is_valid = False
                     validation_layout.add_widget(
@@ -302,7 +338,7 @@ class RegisterPage(Screen):
             else:
                 is_valid = False
                 validation_layout.add_widget(
-                                          MyValidationLabel(text = '* Passwprd must be a length 6 to 12 characters containing at least one digit and one upper case letter  (except i I o and O), one special symbol (“@$”)',
+                                          MyValidationLabel(text = '* Password must be a length 6 to 12 characters.\nIt should contain at least: \n - 1 lowercase\n- 1 uppercase \n - 1 numeric \n - 1 special character',
                                                         pos_hint= {'center_y': 0.300, 'center_x': 0.5})
                                          )      
             
@@ -315,7 +351,7 @@ class RegisterPage(Screen):
         
         
         try:
-            if(self.app.db.get_user(self.ids.username.text) is not None and self.ids.title.text == 'User Registration'):
+            if(self.app.db.get_user(self.ids.username.text) is not None):
                 is_valid = False
                 validation_layout.add_widget(
                                              MyValidationLabel(text = '* A user with that email address is already registered',
@@ -327,43 +363,34 @@ class RegisterPage(Screen):
             self.app.root.current = 'landing_page'
             
         if(is_valid):
-            if(self.ids.title.text == 'User Registration'):
-                try:
-                    self.pop.dismiss() 
-                    email = self.ids.username.text.lower()    
-                    hash_password =  sha256_crypt.hash(password)
-                    if(email=='susanhonours2019@gmail.com'):
-                        self.app.db.add_user(email,hash_password,name, True)
-                    else:
-                        self.app.db.add_user(email,hash_password,name)
-                    self.app.root.current = 'landing_page'
-                    self.pop = self.app.success('Successfull Registration', 'User added to the database')
-                    self.pop.open() 
-                except:
-                    self.pop.dismiss()
-                    print('error 345')
-                    self.app.db_connection_error('User not registered...') 
-            else:
-                try:
-                    self.pop.dismiss() 
-                    email = self.ids.username.text.lower()    
-                    hash_password =  sha256_crypt.hash(password)
-                    self.app.db.update_user(self.app.selected_user['_id'],email,temp_password,name)
-                    self.app.root.current = 'user_home_page'
-                    self.pop = app.success('User successfully updated', 'User updated in the database')
-                    self.pop.open() 
-                except:
-                    self.pop.dismiss()
-                    print('error 314')
-                    self.app.db_connection_error('User not registered...') 
+            try:
+                self.pop.dismiss() 
+                email = self.ids.username.text.lower()    
+                hash_password =  sha256_crypt.hash(password)
+                if(email=='susanhonours2019@gmail.com'):
+                    self.app.db.add_user(email,hash_password,name, True)
+                else:
+                    self.app.db.add_user(email,hash_password,name)
+                self.app.root.current = 'landing_page'
+                self.pop = self.app.success('Successfull Registration', 'User added to the database')
+                self.pop.open() 
+            except:
+                self.pop.dismiss()
+                print('error 345')
+                self.app.db_connection_error('User not registered...') 
         self.pop.dismiss()               
                                             
     def on_leave(self):
         self.ids.confirm_password.text = ''
         self.ids.username.text = ''
-        self.ids.password.text = ''   
+        self.ids.name.text = ''
+        self.ids.password.text = ''  
+        self.ids.confirm_password.size_hint = (.3,0.1)
+        self.ids.username.disabled = False
+        self.ids.title.text = 'User Registration' 
         if(self.pop is not None):     
             self.pop.dismiss()
+
     pass   
 
 class UserHomePage(Screen):   
@@ -518,17 +545,16 @@ class UserHomePage(Screen):
         Clock.schedule_once(self.load_users,0.6)
     
     def db_handle_remove(self, _id,*args):
-        self.app.db.remove_user(_id) 
-        # try:
-            # self.app.db.remove_user(_id)        ### remove
-        # except:
-            # print('error 492')
-            # self.app.db_connection_error('Could not remove user')
+        try:
+            self.app.db.remove_user(_id)        ### remove
+        except:
+            print('error 492')
+            self.app.db_connection_error('Could not remove user')
     
 
     
     def select_help(self):
-        message = 'Greenhouse home page. Add or view a greenhouse.'
+        message = 'User home page. Remove, view or edit a user.'
         
         self.imgbtn_pressed = None
         icons = {}
@@ -672,16 +698,27 @@ class GreenhouseHomePage(Screen):
         
     def info_greenhouse(self,*args):
         greenhouse = self.get_greenhouse('greenhouse_home_page')
+        num_devices = self.get_num_devices()
+        
         content = BoxLayout(orientation = 'horizontal')
         content.add_widget(Image(source = 'icons/info.png', size_hint = (0.7,0.65),pos_hint= {'center_y': 0.5, 'center_x': 0.5}))
         content.add_widget(PopupText(text= 'Width:   ' + greenhouse['dimensions']['width'] + '\n'+
                                   'Length:   ' + greenhouse['dimensions']['length']+ '\n'+
-                                  'Registered devices:   ' + str(len(greenhouse['pi_ids']))))
+                                  'Registered devices:   ' + str(num_devices)))
         pop = Popup(title='Information for '+ greenhouse['nickname']+':', 
                     content=content,
                     size_hint=(0.5,0.5))
         pop.open()
         self.app.current_greenhouse = None	
+        
+    def get_num_devices(self):
+        #_id = ObjectId(_id)
+        devices = []
+        try:
+            devices = self.app.db.get_greenhouse_devices(self.app.current_greenhouse['_id'])
+        except:
+            self.app.db_connection_error('Could not load the devices')
+        return (len(devices))
         
     def remove_greenhouse(self, *args):
         greenhouse = self.get_greenhouse('greenhouse_home_page')
@@ -1162,6 +1199,7 @@ class DeviceHomePage(Screen):
 class AddDevicePage(Screen):
         
     def validate_date(self,day, month, year):
+        validation_layout = self.ids.validation_layout
         ts = None
         date_is_valid = True
         isValid = True
@@ -1178,11 +1216,11 @@ class AddDevicePage(Screen):
             ts = datetime(year = year, month = month , day = day)  
             if(ts > datetime.utcnow()):
                 isValid = False
-                validation_layout.add_widget(
-                                              MyValidationLabel(text = '*Choose a future date',
-                                                                pos_hint= {'center_y': 0.65, 'center_x': 0.5})
+                # validation_layout.add_widget(
+                                              # MyValidationLabel(text = '*Choose a future date',
+                                                                # pos_hint= {'center_y': 0.65, 'center_x': 0.5})
                 
-                                              )   
+                                              # )   
         return [date_is_valid,isValid,ts]
     def on_pre_enter(self):     
         self.app = App.get_running_app()  
@@ -1287,14 +1325,14 @@ class AddDevicePage(Screen):
                 is_valid = False
                 validation_layout.add_widget(
                                           MyValidationLabel(text = '*Choose a valid date',
-                                                            pos_hint= {'center_y': 0.52, 'center_x': 0.5})
+                                                            pos_hint= {'center_y': 0.3, 'center_x': 0.73})
         
                                       )
             elif(not valid_date[1]):
                 is_valid = False
                 validation_layout.add_widget(
                                           MyValidationLabel(text = '*Future date not allowed',
-                                                            pos_hint= {'center_y': 0.52, 'center_x': 0.5})
+                                                            pos_hint= {'center_y': 0.3, 'center_x': 0.73})
         
                                       )        
             if(text=='Add' and is_valid):        
@@ -1308,7 +1346,7 @@ class AddDevicePage(Screen):
                     else:
                         try:
                             dt_planted = valid_date[2]
-                            self.app.db.add_device(pi_id, mode, threshold, plant,dt_planted,self.app.current_greenhouse['_id'])
+                            self.app.db.add_device(pi_id, mode, threshold, plant,dt_planted,self.app.current_greenhouse['_id'],self.app.current_user['email'],)
                             self.app.root.current = 'device_home_page'                             
                         except:
                             print('error 955')
@@ -1991,7 +2029,7 @@ class DeviceDashboardPage(Screen):
         pop = Popup(title='Confirm switch',size_hint=(0.5,0.5))
         
         message_box = BoxLayout(orientation = 'horizontal')
-        message_box.add_widget(Image(source = 'icons/question.png', size_hint = (0.6,0.65),pos_hint= {'center_y': 0.5, 'center_x': 0.5}))
+        message_box.add_widget(Image(source = 'icons/help.png', size_hint = (0.6,0.65),pos_hint= {'center_y': 0.5, 'center_x': 0.5}))
         btn_yes = MyAddButton(text = 'Yes', always_release = True,size_hint = (1,1))
         if(value):
             btn_yes.bind(on_press=lambda x: self.confirm_irrigation_switch(self.app.current_device['_id'],1,pop))
@@ -2240,10 +2278,8 @@ class DeviceDashboardPage(Screen):
         self.alert_view(sensor)
         
     def active_switch(self,instance, value):
-    
-    #try:
-        #ts = datetime.fromisoformat(str(instance.id))
-        alert = self.app.db.get_alert(self.app.current_device['_id'])
+        _id = ObjectId(instance.id)
+        alert = self.app.db.get_alert(_id)
         
         
         alert['active'] = value
@@ -2299,15 +2335,15 @@ class DeviceDashboardPage(Screen):
         if(alerts is not None ):
             grid.clear_widgets()
             grid.cols = 1           
+            str_fmt = '{0:.1f}\u00b0C'
+            if(sensor == 'humidity' or sensor == 'moisture'):
+                str_fmt = '{0:.1f}%'
             for alert in alerts:        
                 greater_than = alert['greater_than']
                 recurring = alert['recurring']
                 value = alert['value']
                 active = alert['active']
-                #str_fmt = '{0:.1f}\u00b0C'
-                str_fmt = '{0:.1f}%'
-                if(alert['sensor'] is 'moisture' or alert['sensor'] is 'humidity'):
-                    str_fmt = '{0:.1f}%'
+
                 
                 big_box= MyCustomWhiteBox(orientation = 'horizontal', size_hint=(1, None))
  
@@ -2332,7 +2368,7 @@ class DeviceDashboardPage(Screen):
     
 
 
-                switch = Switch(size_hint = (0.2,1),pos_hint = {'center_y': 0.5, 'center_x': 0.6}, active = active)   
+                switch = Switch(size_hint = (0.2,1),pos_hint = {'center_y': 0.5, 'center_x': 0.6}, active = active, id = str(alert['_id']))   
                 switch.bind(active=self.active_switch) 
 
                 left_box.add_widget(MyAlertDescription (size_hint = (0.8,0.1),pos_hint = {'center_y': 0.2, 'center_x': 0.4},text = label_desc))       
@@ -2377,7 +2413,51 @@ class DeviceDashboardPage(Screen):
                 sensor_toggle.state = 'down'
             sensor_buttons.append(sensor_toggle)
         return sensor_buttons
-
+    def select_help(self):
+        message = "Device dashboard page. View dashboard, alerts, schedule or history."
+       
+        
+        self.imgbtn_pressed = None
+        icons = {}
+        
+        icons['alerts'] = {
+                          'source' : 'icons/alert.png',
+                          'desc'   : 'view device alerts'
+                        }        
+        icons['schedule'] = {
+                          'source' : 'icons/schedule.png',
+                          'desc'   : 'view device irrigation schedule'
+                        }        
+        icons['history'] = {
+                          'source' : 'icons/analysis.png',
+                          'desc'   : 'view device history'
+                        }        
+        icons['current'] = {
+                          'source' : 'icons/current.png',
+                          'desc'   : 'view latest sensor information'
+                        }        
+        icons['connected'] = {
+                          'source' : 'icons/connected.png',
+                          'desc'   : 'indicates device connectivity (connected, not connected, never connected)'
+                        }
+        icons['mode'] = {
+                          'source' : 'icons/auto.png',
+                          'desc'   : 'indicates irrigation mode (auto, manual)'
+                        }
+        icons['status'] = {
+                          'source' : 'icons/irrigation_active.png',
+                          'desc'   : 'indicates irrigation status (on, off)'
+                        }
+        icons['edit'] = {
+                          'source' : 'icons/edit.png',
+                          'desc'   : 'edit device'
+                        }
+        icons['remove'] = {
+                          'source' : 'icons/remove.png',
+                          'desc'   : 'remove device'
+                        }
+                        
+        self.app.select_help(icons, message)  
     pass    
     
 class AddEditAlertPage(Screen):
@@ -2386,15 +2466,19 @@ class AddEditAlertPage(Screen):
         recurring_toggle = self.ids.recurring
         less_than_toggle = self.ids.less
         more_than_toggle = self.ids.more
+        
         if(button_text == 'Once-off'):
             once_off_toggle.state = 'down'
             recurring_toggle.state = 'normal'
+            
         elif(button_text == 'Every time'):
             once_off_toggle.state = 'normal'
             recurring_toggle.state = 'down' 
+            
         elif(button_text =="Less than"):
             less_than_toggle.state = 'down'
             more_than_toggle.state = 'normal'
+            
         else:
             less_than_toggle.state = 'normal'
             more_than_toggle.state = 'down'
@@ -2422,6 +2506,9 @@ class AddEditAlertPage(Screen):
         self.app.previous_screen = self.app.root.current
         alert = self.app.current_alert
         self.ids.sensor.values = self.get_sensors()    
+        
+        main_layout = self.ids.main_layout
+        
         if(alert is not None):
             if(alert['recurring']):
                 self.ids.recurring.state = 'down'
@@ -2433,12 +2520,57 @@ class AddEditAlertPage(Screen):
                 
             self.ids.value.text = str(alert['value'])
             self.ids.sensor.text = alert['sensor']
+                        
+            btn_no = MyRemoveButton(text = 'Remove', on_press = self.remove_alert ,pos_hint= {'center_y': 0.115, 'center_x': 0.5})
+            main_layout.add_widget(btn_no)
+
+    def remove_alert(self, *args):
+        content = BoxLayout(orientation = 'vertical')
+        pop = Popup(title='Confirm removal',size_hint=(0.5,0.5))
+        
+        message_box = BoxLayout(orientation = 'horizontal')
+        message_box.add_widget(Image(source = 'icons/remove.png', size_hint = (0.6,0.65),pos_hint= {'center_y': 0.5, 'center_x': 0.5}))
+        message_box.add_widget(PopupText(text= 'Are you sure you want to remove the alert?'))
+        
+        respond_box = BoxLayout(orientation = 'horizontal', size_hint = (1,0.2),pos_hint= {'center_y': 0.6, 'center_x': 0.5})
+        btn_yes = MyAddButton(text = 'Yes', always_release = True,size_hint = (1,1))
+        btn_yes.bind(on_press=lambda x: self.confirm_remove(self.app.current_alert['_id'],pop))
+        respond_box.add_widget(btn_yes)
+        btn_no = MyRemoveButton(text = 'No', always_release = True,size_hint = (1,1))
+        btn_no.bind(on_press = pop.dismiss)
+        respond_box.add_widget(btn_no)
+        
+        content.add_widget(message_box)
+        content.add_widget(respond_box)
+        pop.content=content
+        pop.open()
+        
+
+    def confirm_remove(self,_id,pop):
+        self.pop = self.app.please_wait('Removing alert...')
+        
+        Clock.schedule_once(lambda x: self.db_handle_remove(_id), 0.5)
+        pop.dismiss()
+                
+        
+    def db_handle_remove(self, _id,*args):
+ 
+        try:
+            self.app.db.remove_alert(_id)        ### remove
+            pop = self.app.success('Successfull', 'Alert successfully removed')
+            pop.open() 
+            self.app.root.current = 'device_dashboard_page' 
+        except:
+            print('error 2536')
+            self.app.db_connection_error('Could not remove alert')
+            
+        self.pop.dismiss()
         
     def add_alert(self):
         self.pop = self.app.please_wait('Validating alert...')
         self.pop.open()
         Clock.schedule_once(self.handle_add, 0.5)     
-        
+         
     def handle_add(self,*args):
         #create validation layout
         validation_layout = self.ids.validation_layout
@@ -2487,28 +2619,23 @@ class AddEditAlertPage(Screen):
                 
                 try:
                     self.app.db.edit_alert(alert)
-                    pop = Popup(title='Alert edited', content=Label(text='The alert was successfully updated in the database.'),
-                    size_hint=(0.5,0.3))
-                    pop.open()
+                    pop = self.app.success('Alert edited', 'Alert was successfully edited')
+                    pop.open() 
                     self.app.root.current = 'device_dashboard_page' 
                 except:
                     print('error 1905')
-                    pop = Popup(title='Database connection error', content=Label(text='Alert not updated. \nUnable to communicate to the database. \nMake sure you have an active internet connection.'),
-                    size_hint=(0.5,0.3))
-                    pop.open()
+                    self.app.db_connection_error('Alert not updated.')
 
             else:
                 
                 try:
                     self.app.db.add_alert(self.app.current_user['email'],self.app.current_device['_id'],recurring, greater_than, sensor.lower(), value)
-                    pop = self.app.success('Successfull', 'Schedule item sucessfully added to the database. \nAlerts will be sent to user email adress: '+ self.app.current_user['email'])
+                    pop = self.app.success('Successfull', 'Alert was successfully added to the database. \nAlerts will be sent to user email adress: '+ self.app.current_user['email'])
                     pop.open() 
                     self.app.root.current = 'device_dashboard_page' 
                 except:
                     print('error 1918')
-                    pop = Popup(title='Database connection error', content=Label(text='Alert not added. \nUnable to communicate to the database. \nMake sure you have an active internet connection.'),
-                    size_hint=(0.5,0.3))
-                    pop.open()
+                    self.app.db_connection_error('Alert not added.')
         self.pop.dismiss()
     pass
     
@@ -2652,10 +2779,10 @@ class AddScheduleItemPage(Screen):
             else:
                 try:
                     option_value = float(option_value)
-                    if(option_value < 20):
+                    if(option_value < 15):
                         is_valid = False
                         validation_layout.add_widget(
-                                          MyValidationLabel(text = '*Miniumum moisture of 20% required',
+                                          MyValidationLabel(text = '*Miniumum moisture of 15% required',
                                                             pos_hint= {'center_y': 0.35, 'center_x': 0.5})
                                         )
                     else:
@@ -2674,21 +2801,28 @@ class AddScheduleItemPage(Screen):
                 hour = 00
             elif(period == 'pm' and hour < 12):
                 hour = hour + 12
-                
-            ts = datetime(year = year, month = month , day = day,hour = hour, minute=minute)  
-            if(ts < datetime.utcnow()):
+            try:
+                ts = datetime(year = year, month = month , day = day,hour = hour, minute=minute)  
+                if(ts < datetime.utcnow()):
                     is_valid = False
                     validation_layout.add_widget(
-                                          MyValidationLabel(text = '*Choose a future date',
-                                                            pos_hint= {'center_y': 0.65, 'center_x': 0.5})
-        
-                                      )                    
+                                                  MyValidationLabel(text = '*Choose a future date',
+                                                                    pos_hint= {'center_y': 0.65, 'center_x': 0.5})
+                
+                                              ) 
+            except:
+                is_valid = False
+                validation_layout.add_widget(
+                                                  MyValidationLabel(text = '*Choose a valid date',
+                                                                    pos_hint= {'center_y': 0.65, 'center_x': 0.5})
+                
+                                              ) 
                 
         if(is_valid):
             try:
                 print(is_valid)
                 self.app.db.add_schedule_item(ts, duration, threshold,self.app.current_user['email'],self.app.current_device['_id'])
-                pop = self.app.success('Successfull', 'Schedule item sucessfully added to the database.')
+                pop = self.app.success('Successfull', 'Schedule item successfully added to the database.')
                 pop.open() 
                 self.app.root.current = 'device_dashboard_page' 
             except:
@@ -2699,66 +2833,17 @@ class AddScheduleItemPage(Screen):
         self.ids.option_value.text  = ''
         self.ids.hour.text = ''
         self.ids.minute.text = ''
+        self.ids.option_value.disabled = True
+
+        
+
         
     pass
  
 class TestPage(Screen):                                                                        
     pass
 
-class LogoutPage(Screen):
-    def on_enter(self):
-        self.app = App.get_running_app()
-        
-        content = BoxLayout(orientation = 'vertical')
 
-        pop = Popup(title='Log out',size_hint=(0.5,0.5))
-    
-        message_box = BoxLayout(orientation = 'horizontal')
-        message_box.add_widget(Image(source = 'icons/logout.png', size_hint = (0.6,0.65),pos_hint= {'center_y': 0.5, 'center_x': 0.5}))
-        message_box.add_widget(PopupText(text= 'Are you sure you want to log out?'))
-    
-        respond_box = BoxLayout(orientation = 'horizontal', size_hint = (1,0.2),pos_hint= {'center_y': 0.6, 'center_x': 0.5})
-        btn_yes = MyAddButton(text = 'Yes', always_release = True,size_hint = (1,1))
-        btn_yes.bind(on_press=lambda x: self.confirm_logout(pop))
-        respond_box.add_widget(btn_yes)
-        btn_no = MyRemoveButton(text = 'No', always_release = True,size_hint = (1,1))
-        btn_no.bind(on_press = pop.dismiss)
-        respond_box.add_widget(btn_no)
-    
-        content.add_widget(message_box)
-        content.add_widget(respond_box)
-        pop.content=content
-        pop.open()
-        
-        # content = ConfirmPopup(text='Are you sure you want to log out?')
-        # content.bind(on_answer=self._on_answer)
-        # self.popup = Popup(title="Log out?",
-			   # content=content,
-			   # size_hint=(0.8, 0.8),
-			   # pos_hint= {'center_y': 0.42, 'center_x': 0.5},
-			   # auto_dismiss= False)
-        # self.popup.open()
-		
-    # def _confirm(self, instance, answer):
-        # if(answer == 'no'):
-            # self.app.root.current = self.app.previous_screen
-        # else:
-            # self.app.current_user = None	    
-            # self.app.root.current = 'landing_page'	    
-        # self.popup.dismiss()
-    
-    def confirm_logout(self, pop):
-        self.app.current_user = None	    
-        self.app.current_greenhouse = None	    
-        self.app.current_device = None	    
-        self.app.current_alert = None	 
-        pop.dismiss()   
-        self.app.root.current = 'landing_page'    
-    
-    pass
-
-
-   
 class GreenFarmApp(App):
     def db_connection_error(self, title='Error'):
         content = BoxLayout(orientation = 'horizontal')
@@ -2779,7 +2864,7 @@ class GreenFarmApp(App):
                             auto_dismiss = False)
         return pop
         
-    def success(self, title='Successfull', body = 'Sucessfully added'):
+    def success(self, title='Successfull', body = 'Successfully added'):
         content = BoxLayout(orientation = 'horizontal')
         content.add_widget(Image(source = 'icons/success.png', size_hint = (0.7,0.65),pos_hint= {'center_y': 0.5, 'center_x': 0.5}))
         content.add_widget(PopupText(text = body))

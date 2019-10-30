@@ -594,12 +594,44 @@ if __name__ == "__main__":
 	    
         end_date = end_date - timedelta(days=1)
 
-    end_date = datetime.utcnow() 
     
+    
+    
+    
+    end_date = datetime.utcnow() + timedelta(days=1)
     for i in range(50):
 	#24 each day
         for j in range(24):
             x.simulate_data('rp3003', end_date - timedelta(hours=j))
+	    
+        end_date = end_date - timedelta(days=1)
+
+
+
+    end_date = datetime.utcnow()        
+    for i in range(50):
+	#24 each day
+        for j in range(24):
+            x.simulate_data('rp3005', end_date - timedelta(hours=j))
+	    
+        end_date = end_date - timedelta(days=1)
+
+
+    end_date = datetime.utcnow()     
+    for i in range(20):
+	#24 each day
+        for j in range(24):
+            x.simulate_data('rp3006', end_date - timedelta(hours=j))
+	    
+        end_date = end_date - timedelta(days=1)
+
+
+
+    end_date = datetime.utcnow()            
+    for i in range(10):
+	#24 each day
+        for j in range(24):
+            x.simulate_data('rp3007', end_date - timedelta(hours=j))
 	    
         end_date = end_date - timedelta(days=1)
     

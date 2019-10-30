@@ -2491,7 +2491,7 @@ class AddEditAlertPage(Screen):
                 
         self.ids.value.text = ''
         self.ids.sensor.text = 'Choose sensor'
-        
+        self.ids.title.text = 'Add alert'
         self.imgbtn_pressed = None
         self.current_alert = None
 
@@ -2508,8 +2508,10 @@ class AddEditAlertPage(Screen):
         self.ids.sensor.values = self.get_sensors()    
         
         main_layout = self.ids.main_layout
+        title = self.ids.title
         
         if(alert is not None):
+            title.text = 'Edit alert'
             if(alert['recurring']):
                 self.ids.recurring.state = 'down'
                 self.ids.once.state = 'normal'
@@ -2803,6 +2805,8 @@ class AddScheduleItemPage(Screen):
                 hour = hour + 12
             try:
                 ts = datetime(year = year, month = month , day = day,hour = hour, minute=minute)  
+                print(ts)
+                print(datetime.now())
                 if(ts < datetime.utcnow()):
                     is_valid = False
                     validation_layout.add_widget(

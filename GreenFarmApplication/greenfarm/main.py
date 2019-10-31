@@ -1211,16 +1211,20 @@ class AddDevicePage(Screen):
         except:
             print('error 2234')
             date_is_valid = False
+        
+        try:
+            if(date_is_valid):
+                ts = datetime(year = year, month = month , day = day)  
+                if(ts > datetime.utcnow()):
+                    isValid = False
+                        # validation_layout.add_widget(
+                                                      # MyValidationLabel(text = '*Choose a future date',
+                                                                        # pos_hint= {'center_y': 0.65, 'center_x': 0.5})
+                        
+                                                      # )   
+        except:
+                date_is_valid = False  
                 
-        if(date_is_valid):
-            ts = datetime(year = year, month = month , day = day)  
-            if(ts > datetime.utcnow()):
-                isValid = False
-                # validation_layout.add_widget(
-                                              # MyValidationLabel(text = '*Choose a future date',
-                                                                # pos_hint= {'center_y': 0.65, 'center_x': 0.5})
-                
-                                              # )   
         return [date_is_valid,isValid,ts]
     def on_pre_enter(self):     
         self.app = App.get_running_app()  
